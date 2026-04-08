@@ -1,0 +1,5 @@
+docs/*
+!docs/.gitkeep
+
+build/*
+!build/.gitkeep
