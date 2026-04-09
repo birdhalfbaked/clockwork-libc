@@ -1,4 +1,4 @@
-#include "messages.h"
+#include "clockwork/messages.h"
 #include "testing.h"
 #include <stdbool.h>
 
@@ -7,6 +7,7 @@ void test_message_to_bytes() {
   message.type = MESSAGE_CONNECT;
   message.length = 8;
   message.entity_id = 1;
+
   uint8_t bytes[256];
   int8_t byte_length = message_to_bytes(&message, bytes, 256);
   if (byte_length != 10) {

@@ -1,3 +1,10 @@
 CompileFlags:
   Add:
     - "-Iinclude"
+---
+If:
+  PathMatch: tests.*
+CompileFlags:
+  Add:
+    - "-Lbuild"
+    - "-lclockwork"

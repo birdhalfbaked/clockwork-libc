@@ -1,16 +1,10 @@
-#ifndef CLOCKWORK_TYPES_H
-#define CLOCKWORK_TYPES_H
+#ifndef CLOCKWORK_COMMON_TYPES_H
+#define CLOCKWORK_COMMON_TYPES_H
 
 #include <stdint.h>
 
 typedef uint64_t tick_t;
 typedef uint64_t entity_id_t;
-
-typedef struct {
-  entity_id_t entity_id;
-  tick_t current_tick;
-  char *name;
-} entity_t;
 
 /// @brief The level of a pin
 /// @details This is a simple enum that represents the level of a pin. It is

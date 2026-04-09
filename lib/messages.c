@@ -1,4 +1,4 @@
-#include "messages.h"
+#include "clockwork/messages.h"
 #include <stdint.h>
 
 int8_t bytes_to_message(const uint8_t *bytes, size_t buf_length,

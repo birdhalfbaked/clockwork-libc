@@ -1,8 +1,6 @@
 #include "testing.h"
 #include <stdint.h>
 
-extern void messages_tests();
-
 test_result_t test_data[1024];
 uint16_t test_count = 0;
 uint16_t current_test = 0;

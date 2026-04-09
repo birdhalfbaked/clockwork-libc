@@ -1,7 +1,7 @@
 #ifndef CLOCKWORK_MESSAGES_H
 #define CLOCKWORK_MESSAGES_H
 
-#include "types.h"
+#include "common_types.h"
 #include <stdint.h>
 
 enum {
