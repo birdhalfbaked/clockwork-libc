@@ -2,6 +2,7 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"net"
 	"os"
@@ -19,6 +20,18 @@ func main() {
 	conn, err := listener.Accept()
 	if err != nil {
 		fmt.Println("Error accepting connection:", err)
+		os.Exit(1)
+	}
+	// read exactly one message from the connection
+	message := make([]byte, 256)
+	n, err := conn.Read(message)
+	if err != nil {
+		fmt.Println("Error reading message:", err)
+		os.Exit(1)
+	}
+	fmt.Println("Message:", message[:n])
+	if !bytes.Equal(message[:n], []byte{0, 8, 1, 0, 0, 0, 0, 0, 0, 0}) {
+		fmt.Println("Message mismatch:", message[:n])
 		os.Exit(1)
 	}
 	conn.Close()

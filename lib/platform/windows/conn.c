@@ -2,10 +2,10 @@
 #include "clockwork/debug.h"
 #include "clockwork/errors.h"
 
-#define WIN32_LEAN_AND_MEAN
-
 #include <winsock2.h>
 #include <ws2tcpip.h>
+
+#define WIN32_LEAN_AND_MEAN
 
 static bool winsock_initialized = false;
 
@@ -81,8 +81,49 @@ int8_t disconnect_from_server(tcp_conn_t *conn) {
   return ERR_CONN_NO_ERROR;
 }
 int8_t receive_message(tcp_conn_t *conn, message_t *out_message) {
-  return ERR_CONN_NO_ERROR;
+  if (conn->socket == CLOCKWORK_INVALID_SOCKET) {
+    return ERR_CONN_INVALID_STATE;
+  }
+  int8_t result = ERR_CONN_NO_ERROR;
+  uint8_t out_buffer[256];
+  int recv_result =
+      recv(conn->socket, (char *)out_buffer, sizeof(out_buffer), MSG_WAITALL);
+  if (recv_result <= 0) {
+    DEBUG_PRINT("Failed to receive message: %d with error: %d\n", recv_result,
+                WSAGetLastError());
+    result = ERR_CONN_INVALID_STATE;
+  }
+  int8_t bytes_to_message_result =
+      bytes_to_message(out_buffer, recv_result, out_message);
+  if (bytes_to_message_result != recv_result) {
+    DEBUG_PRINT("Failed to convert message: %d != %d\n",
+                bytes_to_message_result, recv_result);
+    result = ERR_CONN_INVALID_STATE;
+  }
+  return result;
 }
+
 int8_t send_message(tcp_conn_t *conn, const message_t *message) {
-  return ERR_CONN_NO_ERROR;
+  if (conn->socket == CLOCKWORK_INVALID_SOCKET) {
+    return ERR_CONN_INVALID_STATE;
+  }
+
+  uint8_t out_buffer[256];
+  int8_t message_to_bytes_result =
+      message_to_bytes(message, out_buffer, sizeof(out_buffer));
+  if (message_to_bytes_result < 0) {
+    DEBUG_PRINT("Failed to convert message: %d != %d\n",
+                message_to_bytes_result, sizeof(message_t));
+    return ERR_CONN_INVALID_STATE;
+  }
+
+  int8_t result = ERR_CONN_NO_ERROR;
+  int send_result =
+      send(conn->socket, (const char *)out_buffer, message_to_bytes_result, 0);
+  if (send_result == -1) {
+    DEBUG_PRINT("Failed to send message: %d with error: %d\n", send_result,
+                WSAGetLastError());
+    result = ERR_CONN_INVALID_STATE;
+  }
+  return result;
 }

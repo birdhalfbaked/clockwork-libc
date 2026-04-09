@@ -11,5 +11,16 @@ int main() {
     fprintf(stderr, "Failed to connect to server: %d\n", result);
     return 1;
   }
+  // send a connect message
+  message_t message = {
+      .type = MESSAGE_CONNECT,
+      .length = 8,
+      .entity_id = 1,
+  };
+  result = send_message(&conn, &message);
+  if (result != ERR_CONN_NO_ERROR) {
+    fprintf(stderr, "Failed to send message: %d\n", result);
+    return 1;
+  }
   return 0;
 }

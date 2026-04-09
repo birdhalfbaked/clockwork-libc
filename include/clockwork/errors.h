@@ -1,6 +1,8 @@
 #ifndef CLOCKWORK_ERRORS_H
 #define CLOCKWORK_ERRORS_H
 
+#include <stdint.h>
+
 enum {
   ERR_CONN_NO_ERROR = 0,
   ERR_CONN_CONNECTION_FAILED = -1,
