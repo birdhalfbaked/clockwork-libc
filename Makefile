@@ -7,7 +7,7 @@ build-lib:
 	@echo "########################################################"
 	@echo "Building $(CLOCKWORK_LIB)"
 	@echo "########################################################"
-	@cd build && gcc -I../include -L../lib -std=c99 -c ../lib/*.c ../lib/platform/windows/*.c -lws2_32
+	@cd build && gcc -D_DEBUG -I../include -L../lib -std=c99 -c ../lib/*.c ../lib/platform/windows/*.c -lws2_32
 	@ar rcs $(CLOCKWORK_LIB) build/*.o
 	@rm build/*.o
 
@@ -26,6 +26,14 @@ test-integration:
 	@echo "Running integration tests"
 	@echo "########################################################"
 	@./tests/integration/tests.sh
+
+run-example: build-lib
+	@echo "########################################################"
+	@echo "Running example"
+	@echo "########################################################"
+	gcc -Iinclude -std=c99 examples/simple_sim.c -Lbuild -lclockwork -lws2_32 -o examples/simple_sim
+	examples/simple_sim.exe
+	rm examples/simple_sim.exe
 
 docs:
 	doxygen

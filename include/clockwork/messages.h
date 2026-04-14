@@ -28,6 +28,8 @@ typedef struct {
   uint8_t length;
   /// @brief The entity ID of the message
   entity_id_t entity_id;
+  /// @brief The tick of the message
+  tick_t tick;
   /// @brief The pin levels of the message (see @ref pin_level_t)
   pin_level_t pin_levels[256];
 } message_t;

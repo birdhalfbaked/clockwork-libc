@@ -30,6 +30,10 @@ int8_t bytes_to_message(const uint8_t *bytes, size_t buf_length,
     case MESSAGE_TICK: {
       out_message->type = type;
       out_message->length = length;
+      out_message->tick = 0;
+      for (size_t i = 0; i < length; i++) {
+        out_message->tick |= (tick_t)bytes[2 + i] << (i * 8);
+      }
       break;
     }
     case MESSAGE_SIL_OUTPUT: {
@@ -67,6 +71,9 @@ int8_t message_to_bytes(const message_t *message, uint8_t *bytes,
       break;
     }
     case MESSAGE_TICK: {
+      for (size_t i = 0; i < 8; i++) {
+        bytes[2 + i] = (uint8_t)(message->tick >> (i * 8)) & 0xFF;
+      }
       break;
     }
     case MESSAGE_SIL_OUTPUT: {

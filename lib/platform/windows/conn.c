@@ -2,10 +2,11 @@
 #include "clockwork/debug.h"
 #include "clockwork/errors.h"
 
+#define WIN32_LEAN_AND_MEAN
 #include <winsock2.h>
 #include <ws2tcpip.h>
 
-#define WIN32_LEAN_AND_MEAN
+#pragma comment(lib, "ws2_32.lib")
 
 static bool winsock_initialized = false;
 
@@ -85,19 +86,28 @@ int8_t receive_message(tcp_conn_t *conn, message_t *out_message) {
     return ERR_CONN_INVALID_STATE;
   }
   int8_t result = ERR_CONN_NO_ERROR;
-  uint8_t out_buffer[256];
-  int recv_result =
-      recv(conn->socket, (char *)out_buffer, sizeof(out_buffer), MSG_WAITALL);
+  uint8_t out_buffer[258];
+  int recv_result = recv(conn->socket, (char *)out_buffer, 2, 0);
   if (recv_result <= 0) {
     DEBUG_PRINT("Failed to receive message: %d with error: %d\n", recv_result,
                 WSAGetLastError());
     result = ERR_CONN_INVALID_STATE;
   }
+
+  uint8_t frame_length = out_buffer[1];
+
+  recv_result = recv(conn->socket, (char *)out_buffer + 2, frame_length, 0);
+  if (recv_result <= 0) {
+    DEBUG_PRINT("Failed to receive message: %d with error: %d\n", recv_result,
+                WSAGetLastError());
+    result = ERR_CONN_INVALID_STATE;
+  }
+
   int8_t bytes_to_message_result =
-      bytes_to_message(out_buffer, recv_result, out_message);
-  if (bytes_to_message_result != recv_result) {
+      bytes_to_message(out_buffer, frame_length + 2, out_message);
+  if (bytes_to_message_result != frame_length + 2) {
     DEBUG_PRINT("Failed to convert message: %d != %d\n",
-                bytes_to_message_result, recv_result);
+                bytes_to_message_result, frame_length + 2);
     result = ERR_CONN_INVALID_STATE;
   }
   return result;
@@ -113,7 +123,7 @@ int8_t send_message(tcp_conn_t *conn, const message_t *message) {
       message_to_bytes(message, out_buffer, sizeof(out_buffer));
   if (message_to_bytes_result < 0) {
     DEBUG_PRINT("Failed to convert message: %d != %d\n",
-                message_to_bytes_result, sizeof(message_t));
+                message_to_bytes_result, message->length + 2);
     return ERR_CONN_INVALID_STATE;
   }
 

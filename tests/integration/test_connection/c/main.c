@@ -22,5 +22,30 @@ int main() {
     fprintf(stderr, "Failed to send message: %d\n", result);
     return 1;
   }
+
+  // now receive a message from the server
+  message_t received_message = {0};
+  result = receive_message(&conn, &received_message);
+  if (result != ERR_CONN_NO_ERROR) {
+    fprintf(stderr, "Failed to receive message: %d\n", result);
+    return 1;
+  }
+  if (received_message.length != 0) {
+    fprintf(stderr, "Received message length mismatch: %d\n",
+            received_message.length);
+    return 1;
+  }
+  if (received_message.type != MESSAGE_TICK) {
+    fprintf(stderr, "Received message type mismatch: %d\n",
+            received_message.type);
+    return 1;
+  }
+
+  // now disconnect from the server
+  result = disconnect_from_server(&conn);
+  if (result != ERR_CONN_NO_ERROR) {
+    fprintf(stderr, "Failed to disconnect from server: %d\n", result);
+    return 1;
+  }
   return 0;
 }
